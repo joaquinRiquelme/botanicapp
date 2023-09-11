@@ -2,7 +2,8 @@ library(shiny)
 library(magrittr)
 
 
-especies <- read.csv("Valdivia_especies.csv")
+# especies <- read.csv("Valdivia_especies.csv")
+especies <- read.csv("Especies_DiversidadFlora.csv")
 head(especies)
 
 ui <- navbarPage(
@@ -13,7 +14,7 @@ ui <- navbarPage(
       tags$img(src = "botanicapp.JPG", height = "50px", style = "margin-top: -5px"),
       href = "https://odes-chile.org"
       ),
-    "Aplicación para mejorar las habilidades de reconocimiento de especies nativas en Chile."
+    "Aplicación para mejorar las habilidades de reconocimiento de especies nativas en Chile"
     ),
   
   tabPanel("Quiz",
