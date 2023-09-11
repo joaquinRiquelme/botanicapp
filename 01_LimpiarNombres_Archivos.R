@@ -34,7 +34,6 @@ especies<- especies %>%
                   FAMILY=NULL) %>% 
            left_join(., chile_sppp, by="Especie")
 
- 
 write.csv(especies, "Especies_DiversidadFlora.csv", row.names=F)
 
 # 2. Verificar que los nombres == nombres en la lista
