@@ -1,0 +1,13 @@
+name: botanicapp
+title:
+username: biogeografiafuncional
+account: biogeografiafuncional
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9783270
+bundleId: 7675632
+url: https://biogeografiafuncional.shinyapps.io/botanicapp/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: Images.zip

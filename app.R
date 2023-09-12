@@ -1,8 +1,11 @@
 # Preambulo ----
 # options(rsconnect.packrat = TRUE)
+# library(httr)    
+# set_config(use_proxy(url="10.3.100.207",port=8080))
 library(shiny)
 library(magrittr)
 library(bslib)
+
 
 # Datos ----
 # especies <- read.csv("Valdivia_especies.csv")
@@ -12,6 +15,7 @@ head(especies)
 # Interfaz de usuario ----
 ui <-page_navbar(
   theme = bs_theme( bg = "#f0f0f0", fg = "#000"),
+  position = "static-top",
   ## Titulo ----
   title  = tags$span(
     class = "title",
@@ -38,9 +42,9 @@ ui <-page_navbar(
         accordion_panel(
           "Seleccione la familia", icon = icon("plant-wilt"),
           uiOutput("seleccion_familia"),
-          selectInput(inputId = "respuesta_familia", label = NULL, 
+          selectInput("respuesta_familia", label = NULL, 
                       choices=sort(unique(especies$FAMILY))),
-          actionButton("respuesta_btn_fam", "Enviar respuesta", icon = icon("arrow-right")),
+          actionButton("respuesta_btn_fam",label="Enviar respuesta", icon = icon("arrow-right")),
           textOutput("valor_output_fam")),
         actionButton("ayuda_btn_fam", "Usar una ayuda", icon = icon("searchengin")),
         textOutput("ayuda_output_fam")
@@ -71,7 +75,7 @@ ui <-page_navbar(
     )
   ,
 ## Panel principal ---- 
-  nav_panel(
+bslib::nav_panel(
     title = "Cuestionario",
     icon  = icon("question"),
     tags$head(
@@ -111,6 +115,8 @@ ui <-page_navbar(
 server <- function(input, output, session) {
   valores.reactivos <- reactiveValues()
   valores.reactivos$contador <- 0
+  valores.reactivos$familia1 <- NA
+  
   observeEvent(input$abrir_btn | input$abrir_btn_2, {
     
     img.name <- sample(unique(especies$Especie),1,replace = FALSE)# input$imagen
@@ -118,7 +124,8 @@ server <- function(input, output, session) {
     print(img_name)
     print(img.name)
     espp <- img.name
-    familia <- unique(especies$FAMILY[especies$Especie==espp])
+    familiaa <- unique(especies$FAMILY[especies$Especie==espp])
+    print(familiaa)
     reactiveValues(a=espp)
     output$imagen_output <- renderImage({
       list(src = paste0("images/", 
@@ -133,17 +140,32 @@ server <- function(input, output, session) {
     }, deleteFile = FALSE)
     
     valores.reactivos$img1 <- espp
-    valores.reactivos$familia1 <- familia
+    valores.reactivos$familia1 <- familiaa
   })
   
   
+  print(valores.reactivos)
   
-  respuesta1 <- reactive({
-    if(valores.reactivos$familia1 == input$respuesta_familia){
-      "Correcto"}else{"Incorrecto"}
-    }) %>% bindCache(input$respuesta_familia) %>% bindEvent(input$respuesta_btn_fam)  
   
-  output$valor_output_fam <- renderText(respuesta1())
+  # Confirma valor de familia
+         verificarOpcion <- function() {
+               opcion_seleccionada <- input$respuesta_familia
+               if (opcion_seleccionada == valores.reactivos$familia1) {
+                 return("¡La opción ingresada es Correcta!")
+                 } else {
+                       return("La opción ingresada es incorrecta.")
+                   }
+           }
+     
+       # verifica al hacer click
+         observeEvent(input$respuesta_btn_fam, {
+           valor_output_fam <- verificarOpcion()
+              output$valor_output_fam <- renderText({
+                valor_output_fam
+                 })
+         })
+  
+  
   
   
   ayuda1 <- reactive({
@@ -154,7 +176,7 @@ server <- function(input, output, session) {
   
   respuesta2 <- reactive({
     if(valores.reactivos$img1 == input$respuesta_especie){
-      "Correcto"}else{"Incorrecto"}
+      "¡La opción ingresada es Correcta!"}else{"La opción ingresada es incorrecta."}
   }) %>% bindCache(input$respuesta_especie) %>% bindEvent(input$respuesta_btn_esp)  
   
   output$valor_output_esp <- renderText(respuesta2())
