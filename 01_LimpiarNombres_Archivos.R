@@ -23,11 +23,19 @@ chile_sppp <- chile_spp %>%
               dplyr::select(., Especie =Name_submitted, TAXONNAME= Accepted_species, SPECIES=Accepted_species,
                             GENUS=Accepted_genus) # aún no sé como agregamos la información de la familia
 
+# volver un par de nombres a su original (ni preguntes)
+chile_sppp <- chile_sppp %>% 
+              mutate(TAXONNAME = if_else(Especie=="Pouteria valparadisaea", "Pouteria splendens", TAXONNAME),
+                     SPECIES = if_else(Especie=="Pouteria valparadisaea", "Pouteria splendens", SPECIES),
+                     Especie = if_else(Especie=="Pouteria valparadisaea", "Pouteria splendens", Especie))
+
 especies<- especies %>% 
            mutate(TAXONNAME=NULL,
                   SPECIES=NULL,
-                  GENUS=NULL) %>% 
-           left_join(., chile_sppp, by="Especie")
+                  GENUS=NULL,
+                  Especie = if_else(Especie=="Pouteria valparadisaea", "Pouteria splendens", Especie)) %>% 
+           left_join(., chile_sppp, by="Especie") %>% 
+           mutate(Especie=TAXONNAME)
 
 write.csv(especies, "Especies_DiversidadFlora.csv", row.names=F)
 
@@ -42,6 +50,8 @@ img.files<-data.frame(img.files) %>%
                      img.files=str_replace_all(img.files, ".jpg",""),
                      img.files=str_replace_all(img.files, "_1",""),
                      img.files=str_replace_all(img.files, "_2",""),
+                     img.files=str_replace_all(img.files, "_3",""),
+                     img.files=str_replace_all(img.files, "_4",""),
                      img.files=str_replace_all(img.files, "_"," ")) %>% 
             rename(., SPECIES=img.files) %>% 
             mutate(imagen=1)
